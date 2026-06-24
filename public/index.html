@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <div class="chat-container">
+        <header>Chatting</header>
+
+        <div id="messages"></div>
+
+        <div class="input-area">
+            <input type="text" id="message" placeholder="Type your message here..." autocomplete="off">
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const sendBtn = document.getElementById('sendBtn');
+        const messageInput = document.getElementById('message');
+        const allMessages = document.getElementById('messages');
+
+        // Combined logic into a single named function
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.emit('chatMessage', message);
+                messageInput.value = '';
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        socket.on('message', (message) => {
+            const p = document.createElement('p');
+            p.innerText = message;
+            allMessages.appendChild(p);
+            allMessages.scrollTop = allMessages.scrollHeight; // Auto-scrolls window down
+        });
+    </script>
+</body>
+
+</html>
